@@ -99,7 +99,7 @@ export const forgetPassword = async (req, res) => {
       { expiresIn: process.env.RESET_PASSWORD_EXPIRATION }
     );
 
-    const resetLink = `http://localhost:3000/api/auth/reset-password?token=${token}`;
+    const resetLink = `https://atg-node-js.onrender.com/api/auth/reset-password?token=${token}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
