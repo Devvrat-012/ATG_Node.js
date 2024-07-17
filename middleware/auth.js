@@ -20,7 +20,9 @@ const auth = async (req, res, next) => {
         .json({ tokenMessage: "No token, authorization denied" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET, {
+      ignoreExpiration: false,
+    });
     req.user = await User.findById(decoded.id).select("-password");
 
     if (!req.user) {
@@ -34,7 +36,13 @@ const auth = async (req, res, next) => {
     console.error("Auth middleware error:", error);
 
     if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ message: "Invalid token" });
+      if (error.message.includes("expired")) {
+        return res
+          .status(401)
+          .json({ message: "Token expired, please login again" });
+      } else {
+        return res.status(401).json({ message: "Invalid token" });
+      }
     } else {
       return res.status(500).json({ message: "Internal Server Error" });
     }
