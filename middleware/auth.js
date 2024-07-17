@@ -35,18 +35,15 @@ const auth = async (req, res, next) => {
   } catch (error) {
     console.error("Auth middleware error:", error);
 
-    if (error.name === "JsonWebTokenError") {
-      if (error.message.includes("expired")) {
-        return res
-          .status(401)
-          .json({ message: "Token expired, please login again" });
-      } else {
-        return res.status(401).json({ message: "Invalid token" });
-      }
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired, please login again" });
+    } else if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token" });
     } else {
       return res.status(500).json({ message: "Internal Server Error" });
     }
   }
+  
 };
 
 export default auth;
